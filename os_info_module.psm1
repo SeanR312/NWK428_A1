@@ -51,14 +51,24 @@ function Test-InputExists {
         [string]$UserChoice
     )
 
-    if ([string]::IsNullOrEmpty($UserChoice)) {
+    try {
 
-        Write-Host "Invalid input. A menu selection is required."
+        if ([string]::IsNullOrEmpty($UserChoice)) {
+
+            Write-Host "Invalid input. A menu selection is required."
+
+            return $false
+        }
+
+        return $true
+    }
+    catch {
+
+        Write-Host "Unable to validate input."
 
         return $false
-    }
 
-    return $true
+    }
 }
 
 <#
@@ -93,16 +103,26 @@ function Test-Whitespace {
         [string]$UserChoice
     )
 
-    if ([string]::IsNullOrWhiteSpace($UserChoice)) {
+    try {
+
+        if ([string]::IsNullOrWhiteSpace($UserChoice)) {
     
-        Write-Host "Invalid input. A menu selection is required."
+            Write-Host "Invalid input. A menu selection is required."
     
-        return $false
+            return $false
+
+        }
+
+        return $true
 
     }
+    catch {
 
-    return $true
+        Write-Host "Unable to validate whitespace."
 
+        return $false    
+    
+    }
 }
 
 <#
@@ -137,20 +157,31 @@ function Convert-ToInteger {
         [string]$UserChoice
     )
 
-    # Validate that the input contains
-    # Whole numbers only
+    try {
 
-    if ($UserChoice -notmatch '^\d+$') {    
+        # Validate that the input contains
+        # Whole numbers only
+
+        if ($UserChoice -notmatch '^\d+$') {    
     
-        Write-Host "Invalid input. Menu selections must be whole numbers."
+            Write-Host "Invalid input. Menu selections must be whole numbers."
     
+            return $null
+
+        }
+
+        # Convert validated input to an Interger
+
+        return [int]$UserChoice
+
+    }
+    catch{
+    
+        Write-Host "Unable to convert input to an integer."
+
         return $null
 
     }
-
-    # Converted validated input to Interger
-
-    return [int]$UserChoice
 
 }
 
@@ -185,14 +216,25 @@ function Test-MenuRange {
         [int]$UserChoice
     )
 
-    if ($UserChoice -lt 1 -or $UserChoice -gt 9) {
-    
-        Write-Host "Invalid input. Please enter a number between 1 and 9."
-    
-        return $false
-    }
+    try {
 
-    return $true
+        if ($UserChoice -lt 1 -or $UserChoice -gt 9) {
+    
+            Write-Host "Invalid input. Please enter a number between 1 and 9."
+    
+            return $false
+        }
+
+        return $true
+
+    }
+    catch {
+        
+        Write-Host "Unable to validate input."
+
+        return $false
+
+    }
 
 }
 
@@ -230,26 +272,35 @@ function Validate-UserChoice {
         [string]$UserChoice
     )
 
-    if (-not (Test-InputExists $UserChoice)) {
+    try {
+
+        if (-not (Test-InputExists $UserChoice)) {
+            return $false
+        }
+
+        if (-not (Test-Whitespace $UserChoice)) {
+            return $false
+        }
+
+        $ConvertedChoice = Convert-ToInteger $UserChoice
+
+        if ($null -eq $ConvertedChoice) {
+            return $false
+        }
+
+        if (-not (Test-MenuRange $ConvertedChoice)) {
+            return $false
+        }
+
+        return $true
+
+    }
+    catch {
+    
+        Write-Host "Unable to validate menu selection"
+
         return $false
     }
-
-    if (-not (Test-Whitespace $UserChoice)) {
-        return $false
-    }
-
-    $ConvertedChoice = Convert-ToInteger $UserChoice
-
-    if ($null -eq $ConvertedChoice) {
-        return $false
-    }
-
-    if (-not (Test-MenuRange $ConvertedChoice)) {
-        return $false
-    }
-
-
-    return $true
 }
 
 <#
