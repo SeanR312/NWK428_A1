@@ -20,7 +20,7 @@
 #
 #
 
-function Check-InputExists {
+function Test-InputExists {
 
     param(
         [string]$UserChoice
@@ -49,7 +49,7 @@ function Check-InputExists {
 #
 #
 
-function Check-Whitespace {
+function Test-Whitespace {
 
     param(
         [string]$UserChoice
@@ -70,14 +70,14 @@ function Check-Whitespace {
 #
 # Function: Convert-ToInteger
 # Purpose:
-#
-#
+# Converts user input to an Interger and 
+# validates that the value is a whole number.
 #
 # Input:
-#
+# UserChoice
 #
 # Output:
-#
+# Interger Value or False
 #
 
 function Convert-ToInteger {
@@ -86,19 +86,20 @@ function Convert-ToInteger {
         [string]$UserChoice
     )
 
-    try {
-    
-        return [int]$UserChoice
+    # Validate that the input contains
+    # Whole numbers only
 
-    }
-    catch {
+    if ($UserChoice -notmatch '^\d+$') {    
     
         Write-Host "Invalid input. Menu selections must be whole numbers."
     
-        return $false
+        return $null
 
     }
 
+    # Converted validated input to Interger
+
+    return [int]$UserChoice
 
 }
 
@@ -115,7 +116,7 @@ function Convert-ToInteger {
 #
 #
 
-function Validate-MenuRange {
+function Test-MenuRange {
 
     param(
         [int]$UserChoice
@@ -151,21 +152,21 @@ function Validate-UserChoice {
         [string]$UserChoice
     )
 
-    if (-not (Check-InputExists $UserChoice)) {
+    if (-not (Test-InputExists $UserChoice)) {
         return $false
     }
 
-    if (-not (Check-Whitespace $UserChoice)) {
+    if (-not (Test-Whitespace $UserChoice)) {
         return $false
     }
 
     $ConvertedChoice = Convert-ToInteger $UserChoice
 
-    if ($ConvertedChoice -eq $false) {
+    if ($ConvertedChoice -is [bool] -and $ConvertedChoice -eq $false) {
         return $false
     }
 
-    if (-not (Validate-MenuRange $ConvertedChoice)) {
+    if (-not (Test-MenuRange $ConvertedChoice)) {
         return $false
     }
 
@@ -193,14 +194,14 @@ function Get-OperatingSystem {
 #
 # Function: Get-WinRMStatus
 # Purpose:
-#
-#
+# 
+#  
 #
 # Input:
-#
+# 
 #
 # Output:
-#
+# 
 #
 
 function Get-WinRMStatus {
@@ -227,25 +228,42 @@ function Get-ManufacturerModel {
 #
 # Function: Get-ComputerName
 # Purpose:
-#
-#
+# Retrieves the the Computer Name
+# from the local Computer
 #
 # Input:
-#
+# none
 #
 # Output:
-#
+# Computer Name
 #
 
+function Get-ComputerName {
+
+
+    try {
+        # Retrive computer information
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        return $computerInfo.CsName
+    }
+    catch{
+        #Display user friendly error message
+        return "Unable to retrieve computer name."
+    }
+}
+
+
+<#
 function Get-ComputerName {
 
     try {
     
         # Retrive computer information
-        $conputerInfo = Get-ComputerInfo
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
 
         #Display computer name
-        $computerInfo.CsName
+        Write-Host "Computer Name:"
+        Write-Host $computerInfo.CsName
     }
     catch {
     
@@ -253,6 +271,7 @@ function Get-ComputerName {
         Write-Host "Unable to retrieve computer name."
     }
 }
+#>
 
 #
 # Function: Get-DomainName
