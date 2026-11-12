@@ -1,8 +1,16 @@
 ﻿<#
 .SYNOPSIS
-
+Operating System Information Module
 
 .DESCRIPTION
+Contains reusable functions used by the 
+operating System Information Tool for 
+ICTNWK428 Assessment 1.
+
+The module provides input validation
+functions and information retrieval
+functions can be called by the
+controller script.
 
 .NOTES
 Author: Sean Reschke
@@ -13,14 +21,28 @@ Assessment: Assessment 1 - Gather Operating System Information
 
 <#
 .SYNOPSIS
+Validates that input has been supplied 
 
 .DESCRIPTION
+Checks whether the user entered a
+menu selection. Rejects null or
+empty input.
+
+PARAMETER UserChoice
+The menu option entered by the user
 
 .OUTPUTS
+Boolean
 
 .EXAMPLE
+Test-InputExists -UserChoiec "1"
 
-Returns
+Returns True.
+
+.EXAMPLE
+Test-InputExists -UserChoice ""
+
+Returns False.
 #>
 
 function Test-InputExists {
@@ -41,14 +63,28 @@ function Test-InputExists {
 
 <#
 .SYNOPSIS
+Validates that input does not contain only whitespace.
 
 .DESCRIPTION
+Checks whether the supplied menu selection
+contains only whitespace characters and
+returns True when the value is valid.
+
+.PARAMTER UserChoice
+The menu option entered by the user
 
 .OUTPUTS
+Boolean
 
 .EXAMPLE
+Test-Whitespace -UserChoice "1"
 
-Returns
+Returns True.
+
+.EXAMPLE
+Test-Whitespace -UserChoice " "
+
+Returns False.
 #>
 
 function Test-Whitespace {
@@ -71,14 +107,28 @@ function Test-Whitespace {
 
 <#
 .SYNOPSIS
+Converts user input to an interger.
 
 .DESCRIPTION
+Validates that the supplied menu selection
+contains only the whole numbers and converts
+the value to an Integer
+
+.PARAMETER UserChoice
+The menu option entered by the user.
 
 .OUTPUTS
+Integer or Null
 
 .EXAMPLE
+Convert-ToInteger -UserChoice "1"
 
-Returns
+Returns 1.
+
+.EXAMPLE
+Convert-ToInteger -UserChoice "abc"
+
+Returns Null.
 #>
 
 function Convert-ToInteger {
@@ -106,14 +156,27 @@ function Convert-ToInteger {
 
 <#
 .SYNOPSIS
+Validates that a menu selection is within range.
 
 .DESCRIPTION
+Checks whether the supplied menu selection
+is between 1 and 9 inclusive.
+
+.PARAMETER UserChoice
+The menu option entered by the user.
 
 .OUTPUTS
+Boolean
 
 .EXAMPLE
+Test-MenuRange -UserChoice 4
 
-Returns
+Returns True.
+
+.EXAMPLE
+Test-MenuRange -UserChoice 15
+
+Returns False.
 #>
 
 function Test-MenuRange {
@@ -135,14 +198,30 @@ function Test-MenuRange {
 
 <#
 .SYNOPSIS
+Validates a menu selection.
 
 .DESCRIPTION
+Validates the user menu selection using
+the required business rules. Checks that
+input exists, is not whitespace, can be
+converted to an Integer and falls within
+the valid menu range
+
+.PARAMETER UserChoice
+The menu option entered by the user.
 
 .OUTPUTS
+Boolean
 
 .EXAMPLE
+Validate-UserChoiece -UserChoice "4"
 
-Returns
+Returns True.
+
+.EXAMPLE
+Validate-UserChoiece -UserChoice "15"
+
+Returns False.
 #>
 
 function Validate-UserChoice {
@@ -161,7 +240,7 @@ function Validate-UserChoice {
 
     $ConvertedChoice = Convert-ToInteger $UserChoice
 
-    if ($ConvertedChoice -is [bool] -and $ConvertedChoice -eq $false) {
+    if ($null -eq $ConvertedChoice) {
         return $false
     }
 
@@ -171,6 +250,29 @@ function Validate-UserChoice {
 
 
     return $true
+}
+
+<#
+.SYNOPSIS
+Retrieves system information.
+
+.DESCRIPTION
+Uses Get-ComputerInfo to retrieve system
+information from the local computer
+
+.OUTPUTS
+Microsoft.PowerShell.Commands.ComputerInfo
+#>
+
+function Get-SystemInformation {
+
+    try {
+        return Get-ComputerInfo -ErrorAction Stop
+
+    }
+    catch {
+        return $
+    }
 }
 
 <#
@@ -195,7 +297,7 @@ function Get-OperatingSystem {
 
     try {
         # Retrive computer information
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        $computerInfo = Get-SystemInformation -ErrorAction Stop
         return $computerInfo.WindowsProductName
     }
     catch{
@@ -253,7 +355,7 @@ Returns manufacturer and model information
 function Get-ManufacturerModel {
 
     try{
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        $computerInfo = Get-SystemInformation -ErrorAction Stop
         return "Manufacturer: $($computerInfo.CsManufacturer)`
        Model: $($computerInfo.CsModel)"
     }
@@ -285,7 +387,7 @@ function Get-ComputerName {
 
     try {
         # Retrive computer information
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        $computerInfo = Get-SystemInformation -ErrorAction Stop
         return $computerInfo.CsName
     }
     catch{
@@ -335,7 +437,7 @@ Returns the domain name.
 function Get-DomainName {
 
     try{
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        $computerInfo = Get-SystemInformation -ErrorAction Stop
         return $computerInfo.CsDomain
     }
     catch{
@@ -403,7 +505,7 @@ Returns the operating system architecture
 function Get-OSArchitecture {
 
     try{
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        $computerInfo = Get-SystemInformation -ErrorAction Stop
         return $computerInfo.OsArchitecture
     }
     catch{
@@ -468,14 +570,24 @@ function Get-AllInformation {
 
 <#
 .SYNOPSIS
+Exports module functions.
 
 .DESCRIPTION
+Makes selected functions avalable to
+scripts that import os_info_module.psm1
+
+Functions that are not exported remain
+private to the module and cannot be
+called directly by external scripts
 
 .OUTPUTS
+None
 
 .EXAMPLE
+Import-Module .\os_info_module.psm1
 
-Returns
+Allows exported functions to be used by
+the controller script
 #>
 
 Export-ModuleMember -Function @(
