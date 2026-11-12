@@ -1,24 +1,27 @@
-﻿#=====================================
-# Module Name: os_info_module.psm1
-# Author: Sean Reschke 000846800
-# Unit: ICTNWK428
-# Purpose:
-# Contains reusable functions for the 
-# OS Information Assessment 1 tool.
-#=====================================
+﻿<#
+.SYNOPSIS
 
-#
-# Function: Check-InputExists
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+
+.DESCRIPTION
+
+.NOTES
+Author: Sean Reschke
+Unit: ICTNWK428
+Assessment: Assessment 1 - Gather Operating System Information
+
+#>
+
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 function Test-InputExists {
 
@@ -36,18 +39,17 @@ function Test-InputExists {
     return $true
 }
 
-#
-# Function: Check-Whitespace
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 function Test-Whitespace {
 
@@ -67,18 +69,17 @@ function Test-Whitespace {
 
 }
 
-#
-# Function: Convert-ToInteger
-# Purpose:
-# Converts user input to an Interger and 
-# validates that the value is a whole number.
-#
-# Input:
-# UserChoice
-#
-# Output:
-# Interger Value or False
-#
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 function Convert-ToInteger {
 
@@ -103,18 +104,17 @@ function Convert-ToInteger {
 
 }
 
-#
-# Function: Validate-MenuRange
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 function Test-MenuRange {
 
@@ -133,18 +133,17 @@ function Test-MenuRange {
 
 }
 
-#
-# Function: Validate-UserChoice
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 function Validate-UserChoice {
 
@@ -174,69 +173,112 @@ function Validate-UserChoice {
     return $true
 }
 
-#
-# Function: Get-OperatingSystem
-# Purpose:
-# Retrieves operating system information
-# from local computer
-#
-# Input:
-# None
-#
-# Output:
-# Operating System information
-#
+<#
+.SYNOPSIS
+Retrives operating system information.
+
+.DESCRIPTION
+User Get-ComputerInfo to retrieve the
+operating system information from the
+local computer
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-Operating System
+
+Returns the operating system name.
+#>
 
 function Get-OperatingSystem {
 
+    try {
+        # Retrive computer information
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        return $computerInfo.WindowsProductName
+    }
+    catch{
+        #Display user friendly error message
+        return "Unable to retrieve operating system information"
+    
+    }
 }
 
-#
-# Function: Get-WinRMStatus
-# Purpose:
-# 
-#  
-#
-# Input:
-# 
-#
-# Output:
-# 
-#
+<#
+.SYNOPSIS
+Retrieves WinRM service status.
+
+.DESCRIPTION
+Uses Get-Service to retrieve the
+Windows Remote Management service status.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-WinRMStatus
+
+Returns the WinRM service status.
+#>
 
 function Get-WinRMStatus {
 
+    try{
+        $serviceInfo = Get-Service -Name WinRM -ErrorAction Stop
+        return $serviceInfo.Status
+    }
+    catch{
+        return "Unable to retrieve WinRM service status."
+    }
 }
 
-#
-# Function: Get-ManufacturerModel
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+Retrieves manufacturer and model information.
+
+.DESCRIPTION
+Uses Get-ComputerInfo to retrieve the
+manufacturer and model of the local computer.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-ManufacturerModel
+
+Returns manufacturer and model information
+#>
 
 function Get-ManufacturerModel {
 
+    try{
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        return "Manufacturer: $($computerInfo.CsManufacturer)`
+       Model: $($computerInfo.CsModel)"
+    }
+    catch{
+        return "Unable to retrieve manufacturer and model information." 
+    }
 }
 
-#
-# Function: Get-ComputerName
-# Purpose:
-# Retrieves the the Computer Name
-# from the local Computer
-#
-# Input:
-# none
-#
-# Output:
-# Computer Name
-#
+<#
+
+.SYNOPSIS
+Retrives the computer name from the local computer
+
+.DESCRIPTION
+Uses Get-ComputerInfo to retrieve the computer name of the local system.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-ComputerName
+
+Returns the computer name of the local computer
+
+#>
 
 function Get-ComputerName {
 
@@ -273,86 +315,168 @@ function Get-ComputerName {
 }
 #>
 
-#
-# Function: Get-DomainName
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+Retrieves domain name information
+
+.DESCRIPTION
+Users Get-ComputerInfo to retrieve the
+domain name from the local computer.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-DomainName
+
+Returns the domain name.
+#>
 
 function Get-DomainName {
 
+    try{
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        return $computerInfo.CsDomain
+    }
+    catch{
+        return "Unable to retrieve domain name"
+    }
 }
 
-#
-# Function: Get-TrustedHosts
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+Retrieves Trusted Hosts information
+
+.DESCRIPTION
+Uses the WSMan provider to retrieve the
+Trusted Hosts configuration from the 
+local computer.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-TrustedHosts
+
+Returns the Trusted Hosts configuration
+#>
 
 function Get-TrustedHosts {
 
+    try{
+        $trustedHosts = Get-Item `
+        WSMan:\localhost\Client\TrustedHosts `
+        -ErrorAction Stop
+
+        # Check whether any Trusted Hosts
+        # have been configured
+
+        if ([string]::IsNullOrWhiteSpace($trustedHosts.Value)){
+            return "No Trusted Hosts configured"
+        }
+
+        return $trustedHosts.Value
+    }
+    catch{
+        return "Unable to retrieve Trusted Hosts information."
+    }
 }
 
-#
-# Function: Get-OSArchitecture
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+Retrieves operating system architecture information.
+
+.DESCRIPTION
+Uses Get-ComputerInfo to retrieve the
+operating system architecture from the 
+local computer.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-OSArchitecture
+
+Returns the operating system architecture
+#>
 
 function Get-OSArchitecture {
 
+    try{
+        $computerInfo = Get-ComputerInfo -ErrorAction Stop
+        return $computerInfo.OsArchitecture
+    }
+    catch{
+        return "Unable to retrieve operating system architecture."
+    }
 }
 
-#
-# Function: Get-AllInformation
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+Retrieves all operating system information.
+
+.DESCRIPTION
+Calls all information retrieval functions
+and returns their results.
+
+.OUTPUTS
+String
+
+.EXAMPLE
+Get-AllInformation
+
+Returns all avalable operating system information
+#>
 
 function Get-AllInformation {
 
+    try{
+        $allInformation = ""
+
+        $allInformation += "Operating System: "
+        $allInformation += Get-OperatingSystem
+        $allInformation += "`n`n"
+        
+        $allInformation += "Windows Remote Service Status: "
+        $allInformation += Get-WinRMStatus
+        $allInformation += "`n`n"
+
+        $allInformation += Get-ManufacturerModel
+        $allInformation += "`n`n"
+
+        $allInformation += "Computer Name: "
+        $allInformation += Get-ComputerName
+        $allInformation += "`n`n"
+
+        $allInformation += "Domain Name: "
+        $allInformation += Get-DomainName
+        $allInformation += "`n`n"
+
+        $allInformation += "Trusted Hosts: "
+        $allInformation += Get-TrustedHosts
+        $allInformation += "`n`n"
+
+        $allInformation += "OS Architecture: "
+        $allInformation += Get-OSArchitecture
+
+        return $allInformation
+    }
+    catch{
+        return "Unable to retrieve all information."
+    }
 }
 
-#
-# Function:
-# Purpose:
-#
-#
-#
-# Input:
-#
-#
-# Output:
-#
-#
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+
+.OUTPUTS
+
+.EXAMPLE
+
+Returns
+#>
 
 Export-ModuleMember -Function @(
     'Validate-UserChoice',

@@ -1,20 +1,26 @@
-﻿#=====================================
-# ICTNWK428 Assessment 1
-# Gather Operating System Information
-#
-# Author: Sean Reschke
-#
-# Controller Script
-#
-# This script displays a menu-drive
-# interface allowing users to retrive 
-# operating system and computer
-# information
-#=====================================
+﻿<#
+.SYNOPSIS
+Operating System Information Tool.
 
+.DESCRIPTION
+Menu Driven controller script used to retrieve
+operating system and computer information.
+
+.NOTES
+Author: Sean Reschke
+Unit: ICTNWK428
+Assessment: Assessment 1 - Gather Operating System Information
+
+This script imports functions from
+os_info_module.psm1 and provides a menu-driven
+interface for users.
+#>
+
+# Import required module
 Import-Module .\os_info_module.psm1 -Force
 
-do {
+#Display menu options
+function Show-Menu {
 
     Write-Host ""
     Write-Host "================================="
@@ -30,6 +36,13 @@ do {
     Write-Host "8. Get All Information"
     Write-Host "9. Quit"
     Write-Host ""
+}
+
+# Main controller loop
+do {
+
+    #Display the menu
+    Show-Menu
 
     # Prompt user for menu selection
     $UserChoice = Read-Host "Enter Selection"
@@ -37,6 +50,8 @@ do {
     #Validate user input
     if (Validate-UserChoice $UserChoice) {
     
+        $result = $null
+        
         switch ([int]$UserChoice) {
         
         1 {
@@ -65,7 +80,7 @@ do {
             Write-Host "----------------------"
         
         
-            $result = Get-ManufactureModel
+            $result = Get-ManufacturerModel
 
             Write-Host $result
         }
