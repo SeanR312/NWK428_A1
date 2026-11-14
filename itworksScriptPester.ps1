@@ -38,7 +38,17 @@ Describe "Get-AllComputerInformation" {
             Mock Get-ComputerInfo {
                 return [PSCustomObject]@{
                     WindowsProductName = 'Windows 11'
-                    OSArchitecture = '64-bit'
+                    OsArchitecture = '64-bit'
+                    CsName = 'SERVER1'
+                    CsDomain = 'W2K22AD.local'
+                    CsManufacturer = 'VMware, Inc.'
+                    CsModel = 'WMware7,1'
+                }
+            }
+            Mock Get-SystemInformation {
+                return [PSCustomObject]@{
+                    WindowsProductName = 'Windows 11'
+                    OsArchitecture = '64-bit'
                     CsName = 'SERVER1'
                     CsDomain = 'W2K22AD.local'
                     CsManufacturer = 'VMware, Inc.'
@@ -49,14 +59,14 @@ Describe "Get-AllComputerInformation" {
 
         It "Returns formatted computer information" {
             $result = Get-AllComputerInformation
-            $result | Should - Match "Windows 11"
+            $result | Should -Match "Windows 11"
         }
-<#
+
         It "Calls Get-ComputerInfo through Get-SystemInformation" {
             Get-AllComputerInformation
             Should -Invoke Get-SystemInformation
         }
-#>
+
         It "Returns error string on failure" {
             Mock Get-SystemInformation { throw 'Failure' } 
             $result = Get-AllComputerInformation
@@ -75,7 +85,7 @@ Describe "Show-Menu" {
     }
 }
 
-<#
+
 Describe "Start-MainFunction" {
     BeforeEach {
         Mock Show-Menu {}
@@ -94,10 +104,11 @@ Describe "Start-MainFunction" {
                     }
                     else{
                         return '9'
-                    } 
-                Start-MainFunction
-                Should -Invoke Get-ComputerInformation -Times 1
-        }
+                    }
+                } 
+            Start-MainFunction
+            Should -Invoke Get-ComputerInformation -Times 1
+        
     }
 
         It "Handles option 8" {
@@ -110,9 +121,9 @@ Describe "Start-MainFunction" {
                     else{
                         return '9'
                     }
+                }
             Start-MainFunction
             Should -Invoke Get-AllComputerInformation -Times 1
-        }
     }
 
     Context "Invalid selection greater than 8" {
@@ -139,4 +150,3 @@ Describe "Start-MainFunction" {
         }
     }
 }
-#>
