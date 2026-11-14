@@ -328,38 +328,6 @@ function Get-SystemInformation {
 
 <#
 .SYNOPSIS
-Retrives operating system information.
-
-.DESCRIPTION
-User Get-ComputerInfo to retrieve the
-operating system information from the
-local computer
-
-.OUTPUTS
-String
-
-.EXAMPLE
-Get-Operating System
-
-Returns the operating system name.
-#>
-
-function Get-OperatingSystem {
-
-    try {
-        # Retrive computer information
-        $computerInfo = Get-SystemInformation -ErrorAction Stop
-        return $computerInfo.WindowsProductName
-    }
-    catch{
-        #Display user friendly error message
-        return "Unable to retrieve operating system information"
-    
-    }
-}
-
-<#
-.SYNOPSIS
 Retrieves WinRM service status.
 
 .DESCRIPTION
@@ -416,83 +384,51 @@ function Get-ManufacturerModel {
 }
 
 <#
-
 .SYNOPSIS
-Retrives the computer name from the local computer
+Retrieves a requested computer information property.
 
 .DESCRIPTION
-Uses Get-ComputerInfo to retrieve the computer name of the local system.
+Uses the system information object returned by
+Get-System Information and returns the requested property.
+
+.PARAMETER PropertyName
+The computer information property to retrieve.
 
 .OUTPUTS
 String
 
 .EXAMPLE
-Get-ComputerName
+Get-ComputerInformation `
+    -PropertyName "CsName"
 
-Returns the computer name of the local computer
+Returns the computer name.
 
+,EXAMPLE
+Get-ComputerInformation `
+    -PropertyName "CsDomain"
+
+Returns the computer domain name.
 #>
 
-function Get-ComputerName {
+function Get-ComputerInformation {
 
-
-    try {
-        # Retrive computer information
-        $computerInfo = Get-SystemInformation -ErrorAction Stop
-        return $computerInfo.CsName
-    }
-    catch{
-        #Display user friendly error message
-        return "Unable to retrieve computer name."
-    }
-}
-
-
-<#
-function Get-ComputerName {
-
-    try {
-    
-        # Retrive computer information
-        $computerInfo = Get-ComputerInfo -ErrorAction Stop
-
-        #Display computer name
-        Write-Host "Computer Name:"
-        Write-Host $computerInfo.CsName
-    }
-    catch {
-    
-        #Display user friendly error message
-        Write-Host "Unable to retrieve computer name."
-    }
-}
-#>
-
-<#
-.SYNOPSIS
-Retrieves domain name information
-
-.DESCRIPTION
-Users Get-ComputerInfo to retrieve the
-domain name from the local computer.
-
-.OUTPUTS
-String
-
-.EXAMPLE
-Get-DomainName
-
-Returns the domain name.
-#>
-
-function Get-DomainName {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet(
+            'WindowsProductName',
+            'CsName',
+            'CsDomain',
+            'OsArchitecture'
+            )]
+        [string]$PropertyName
+    )
 
     try{
-        $computerInfo = Get-SystemInformation -ErrorAction Stop
-        return $computerInfo.CsDomain
+        $computerInfo = Get-SystemInformation
+        return $computerInfo.$PropertyName
     }
     catch{
-        return "Unable to retrieve domain name"
+        return "Error: Unable to retrieve requested property."
     }
 }
 
@@ -537,72 +473,53 @@ function Get-TrustedHosts {
 
 <#
 .SYNOPSIS
-Retrieves operating system architecture information.
+Retrieves all required computer information.
 
 .DESCRIPTION
-Uses Get-ComputerInfo to retrieve the
-operating system architecture from the 
-local computer.
+Calls information retrieval functions and
+returns all required Assessment 1 information.
 
 .OUTPUTS
 String
 
 .EXAMPLE
-Get-OSArchitecture
-
-Returns the operating system architecture
-#>
-
-function Get-OSArchitecture {
-
-    try{
-        $computerInfo = Get-SystemInformation -ErrorAction Stop
-        return $computerInfo.OsArchitecture
-    }
-    catch{
-        return "Unable to retrieve operating system architecture."
-    }
-}
-
-<#
-.SYNOPSIS
-Retrieves all operating system information.
-
-.DESCRIPTION
-Calls all information retrieval functions
-and returns their results.
-
-.OUTPUTS
-String
-
-.EXAMPLE
-Get-AllInformation
+Get-AllComputerInformation
 
 Returns all avalable operating system information
 #>
 
-function Get-AllInformation {
+function Get-AllComputerInformation {
 
     try{
         $allInformation = ""
 
         $allInformation += "Operating System: "
-        $allInformation += Get-OperatingSystem
+        $allInformation += Get-ComputerInformation `
+            -PropertyName "WindowsProductName"
         $allInformation += "`n`n"
         
         $allInformation += "Windows Remote Service Status: "
         $allInformation += Get-WinRMStatus
         $allInformation += "`n`n"
 
-        $allInformation += Get-ManufacturerModel
+        $allInformation += "Manufacturer: "
+        $allInformation += Get-SystemInformation |
+            -Select-Object -ExpandProperty CsManufacturer
+        $allInformation += "`n`n"
+
+        $allInformation += "Model: "
+        $allInformation += Get-SystemInformation |
+            -Select-Object -ExpandProperty CsModel
         $allInformation += "`n`n"
 
         $allInformation += "Computer Name: "
-        $allInformation += Get-ComputerName
+        $allInformation += Get-ComputerInformation `
+            -PropertyName "CsName"
         $allInformation += "`n`n"
 
         $allInformation += "Domain Name: "
-        $allInformation += Get-DomainName
+        $allInformation += Get-ComputerInformation `
+            -PropertyName "CsDomain"
         $allInformation += "`n`n"
 
         $allInformation += "Trusted Hosts: "
@@ -610,7 +527,8 @@ function Get-AllInformation {
         $allInformation += "`n`n"
 
         $allInformation += "OS Architecture: "
-        $allInformation += Get-OSArchitecture
+        $allInformation += Get-ComputerInformation `
+            -PropertyName "OsArchitecture"
 
         return $allInformation
     }
@@ -643,12 +561,9 @@ the controller script
 
 Export-ModuleMember -Function @(
     'Validate-UserChoice',
-    'Get-OperatingSystem',
+    'Get-ComputerInformation',
     'Get-WinRMStatus',
-    'Get-ManufacturerModel',
-    'Get-ComputerName',
-    'Get-DomainName',
+    'Get-ManufacturerModel',,
     'Get-TrustedHosts',
-    'Get-OSArchitecture',
-    'Get-AllInformation'
+    'Get-AllComputerInformation'
 )

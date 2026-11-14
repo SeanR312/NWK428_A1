@@ -59,7 +59,7 @@ do {
             Write-Host "Operating System"
             Write-Host "----------------"
                 
-            $result = Get-OperatingSystem
+            $result = Get-ComputerInformation -PropertyName "WindowsProductName"
 
             Write-Host $result
         }
@@ -90,7 +90,7 @@ do {
             Write-Host "Computer Name"
             Write-Host "-------------"
 
-            $result = Get-ComputerName
+            $result = Get-ComputerInformation -PropertyName "CsName"
 
             Write-Host $result
         }
@@ -100,7 +100,7 @@ do {
             Write-Host "Domain Name"
             Write-Host "-----------"
         
-            $result = Get-DomainName
+            $result = Get-ComputerInformation -PropertyName "CsDomain"
 
             Write-Host $result
         }
@@ -120,7 +120,7 @@ do {
             Write-Host "OS Architecture"
             Write-Host "---------------"
         
-            $result = Get-OSArchitecture
+            $result = Get-ComputerInformation -PropertyName "OsArchitecture"
 
             Write-Host $result
         }
@@ -130,7 +130,7 @@ do {
             Write-Host "Get All Information"
             Write-Host "-------------------"
         
-            $result = Get-AllInformation
+            $result = Get-AllComputerInformation
 
             Write-Host $result
         }
