@@ -19,7 +19,23 @@ interface for users.
 # Import required module
 Import-Module .\os_info_module.psm1 -Force
 
-#Display menu options
+<#
+.SYNOPSIS
+Display menu options.
+
+.DESCRIPTION
+Displays all available menu options for the
+Operating System Information Tool.
+
+.OUTPUTS
+None
+
+.EXAMPLE
+Show-Menu
+
+Displays the menu
+#>
+
 function Show-Menu {
 
     Write-Host ""
@@ -38,107 +54,139 @@ function Show-Menu {
     Write-Host ""
 }
 
-# Main controller loop
-do {
+<#
+.SYNOPSIS
+Runs the main application loop.
 
-    #Display the menu
-    Show-Menu
+.DESCRIPTION
+Displays the menu, validates user selections,
+calls the information retrieval functions and
+continues running until the user selects Quit.
 
-    # Prompt user for menu selection
-    $UserChoice = Read-Host "Enter Selection"
+.OUTPUTS
+None
 
-    #Validate user input
-    if (Validate-UserChoice $UserChoice) {
+.EXAMPLE
+Start-MainFunction
+
+Starts the application.
+#>
+
+function Start-MainFunction {
     
-        $result = $null
+    do {
+
+        #Display the menu
+        Show-Menu
+
+        # Prompt user for menu selection
+        $UserChoice = Read-Host "Enter Selection"
+
+        #Validate user input
+        if (Validate-UserChoice $UserChoice) {
+    
+            $result = $null
         
-        switch ([int]$UserChoice) {
+            switch ([int]$UserChoice) {
         
-        1 {
-            Write-Host ""
-            Write-Host "Operating System"
-            Write-Host "----------------"
+            1 {
+                Write-Host ""
+                Write-Host "Operating System"
+                Write-Host "----------------"
                 
-            $result = Get-ComputerInformation -PropertyName "WindowsProductName"
+                $result = Get-ComputerInformation -PropertyName "WindowsProductName"
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        2 {
-            Write-Host ""
-            Write-Host "Windows Remote Service Status"
-            Write-Host "-----------------------------"
+            2 {
+                Write-Host ""
+                Write-Host "Windows Remote Service Status"
+                Write-Host "-----------------------------"
         
-            $result = Get-WinRMStatus
+                $result = Get-WinRMStatus
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        3 {
-            Write-Host ""
-            Write-Host "Manufacturer and Model"
-            Write-Host "----------------------"
+            3 {
+                Write-Host ""
+                Write-Host "Manufacturer and Model"
+                Write-Host "----------------------"
         
         
-            $result = Get-ManufacturerModel
+                $result = Get-ManufacturerModel
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        4 {
-            Write-Host ""
-            Write-Host "Computer Name"
-            Write-Host "-------------"
+            4 {
+                Write-Host ""
+                Write-Host "Computer Name"
+                Write-Host "-------------"
 
-            $result = Get-ComputerInformation -PropertyName "CsName"
+                $result = Get-ComputerInformation -PropertyName "CsName"
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        5 {
-            Write-Host ""
-            Write-Host "Domain Name"
-            Write-Host "-----------"
+            5 {
+                Write-Host ""
+                Write-Host "Domain Name"
+                Write-Host "-----------"
         
-            $result = Get-ComputerInformation -PropertyName "CsDomain"
+                $result = Get-ComputerInformation -PropertyName "CsDomain"
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        6 {
-            Write-Host ""
-            Write-Host "Trusted Hosts"
-            Write-Host "-------------"
+            6 {
+                Write-Host ""
+                Write-Host "Trusted Hosts"
+                Write-Host "-------------"
         
-            $result = Get-TrustedHosts
+                $result = Get-TrustedHosts
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        7 {
-            Write-Host ""
-            Write-Host "OS Architecture"
-            Write-Host "---------------"
+            7 {
+                Write-Host ""
+                Write-Host "OS Architecture"
+                Write-Host "---------------"
         
-            $result = Get-ComputerInformation -PropertyName "OsArchitecture"
+                $result = Get-ComputerInformation -PropertyName "OsArchitecture"
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        8 {
-            Write-Host ""
-            Write-Host "Get All Information"
-            Write-Host "-------------------"
+            8 {
+                Write-Host ""
+                Write-Host "Get All Information"
+                Write-Host "-------------------"
         
-            $result = Get-AllComputerInformation
+                $result = Get-AllComputerInformation
 
-            Write-Host $result
-        }
+                Write-Host $result
+            }
 
-        9 {Write-Host "Exiting Program"}
+            9 {Write-Host "Exiting Program"}
         
-        }
+            }
     
-    }
+        }
 
-} while ($UserChoice -ne "9")
+    } while ($UserChoice -ne "9")
+
+}
+
+# Start application
+# When running Pester tests, comment out the line below
+# and uncomment the debug/testing block.
+
+#Start-MainFunction
+
+# Pester / debugging execution
+if ($MyInvocation.InvocationName -ne '.') {
+    Start-MainFunction
+}

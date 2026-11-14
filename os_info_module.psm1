@@ -55,18 +55,14 @@ function Test-InputExists {
 
         if ([string]::IsNullOrEmpty($UserChoice)) {
 
-            Write-Host "Invalid input. A menu selection is required."
-
-            return $false
+            return "Invalid input. A menu selection is required."
         }
 
         return $true
     }
     catch {
 
-        Write-Host "Unable to validate input."
-
-        return $false
+        return "Unable to validate input."
 
     }
 }
@@ -106,10 +102,8 @@ function Test-Whitespace {
     try {
 
         if ([string]::IsNullOrWhiteSpace($UserChoice)) {
-    
-            Write-Host "Invalid input. A menu selection is required."
-    
-            return $false
+        
+            return "Invalid input. A menu selection is required."
 
         }
 
@@ -118,9 +112,7 @@ function Test-Whitespace {
     }
     catch {
 
-        Write-Host "Unable to validate whitespace."
-
-        return $false    
+        return "Unable to validate whitespace."    
     
     }
 }
@@ -163,10 +155,8 @@ function Convert-ToInteger {
         # Whole numbers only
 
         if ($UserChoice -notmatch '^\d+$') {    
-    
-            Write-Host "Invalid input. Menu selections must be whole numbers."
-    
-            return $null
+       
+            return "Invalid input. Menu selections must be whole numbers."
 
         }
 
@@ -176,10 +166,8 @@ function Convert-ToInteger {
 
     }
     catch{
-    
-        Write-Host "Unable to convert input to an integer."
 
-        return $null
+        return "Unable to convert input to an integer."
 
     }
 
@@ -220,19 +208,15 @@ function Test-MenuRange {
 
         if ($UserChoice -lt 1 -or $UserChoice -gt 9) {
     
-            Write-Host "Invalid input. Please enter a number between 1 and 9."
-    
-            return $false
+            return "Invalid input. Please enter a number between 1 and 9."
         }
 
         return $true
 
     }
     catch {
-        
-        Write-Host "Unable to validate input."
 
-        return $false
+        return "Unable to validate input."
 
     }
 
@@ -274,23 +258,49 @@ function Validate-UserChoice {
 
     try {
 
-        if (-not (Test-InputExists $UserChoice)) {
+        $result = Test-InputExists $UserChoice
+        
+        if ($result -ne $true) {
+            Write-Host $result
+            return $false
+        }   
+               
+        #if (-not (Test-InputExists $UserChoice)) {
+        #    return $false
+        #}
+
+        $result = Test-Whitespace $UserChoice
+        
+        if ($result -ne $true) {
+            Write-Host $result
             return $false
         }
 
-        if (-not (Test-Whitespace $UserChoice)) {
-            return $false
-        }
+        #if (-not (Test-Whitespace $UserChoice)) {
+        #   return $false
+        #}
 
         $ConvertedChoice = Convert-ToInteger $UserChoice
 
-        if ($null -eq $ConvertedChoice) {
+        if ($ConvertedChoice -is [string]) {
+            Write-Host $ConvertedChoice
             return $false
         }
 
-        if (-not (Test-MenuRange $ConvertedChoice)) {
+        #if ($null -eq $ConvertedChoice) {
+        #    return $false
+        #}
+
+        $result = Test-MenuRange $ConvertedChoice
+        
+        if ($result -ne $true) {
+            Write-Host $result
             return $false
         }
+
+        #if (-not (Test-MenuRange $ConvertedChoice)) {
+        #    return $false
+        #}
 
         return $true
 
@@ -504,12 +514,12 @@ function Get-AllComputerInformation {
 
         $allInformation += "Manufacturer: "
         $allInformation += Get-SystemInformation |
-            -Select-Object -ExpandProperty CsManufacturer
+            Select-Object -ExpandProperty CsManufacturer
         $allInformation += "`n`n"
 
         $allInformation += "Model: "
         $allInformation += Get-SystemInformation |
-            -Select-Object -ExpandProperty CsModel
+            Select-Object -ExpandProperty CsModel
         $allInformation += "`n`n"
 
         $allInformation += "Computer Name: "
@@ -533,6 +543,9 @@ function Get-AllComputerInformation {
         return $allInformation
     }
     catch{
+        
+        #use commented return function to get error details when debugging
+        #return $_.Exception.Message
         return "Unable to retrieve all information."
     }
 }
@@ -563,7 +576,7 @@ Export-ModuleMember -Function @(
     'Validate-UserChoice',
     'Get-ComputerInformation',
     'Get-WinRMStatus',
-    'Get-ManufacturerModel',,
+    'Get-ManufacturerModel',
     'Get-TrustedHosts',
     'Get-AllComputerInformation'
 )
