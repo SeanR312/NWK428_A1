@@ -73,8 +73,17 @@ Starts the application.
 #>
 
 function Start-MainFunction {
+
+    $loopCounter = 0
     
     do {
+
+        $loopCounter++
+        Write-Host "Loop Count: $LoopCounter" -ForegroundColor Yellow
+        if ($loopCounter -gt 20) {
+            throw "Safety stop triggered"
+        }
+
 
         #Display the menu
         Show-Menu

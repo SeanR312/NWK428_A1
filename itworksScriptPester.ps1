@@ -88,65 +88,62 @@ Describe "Show-Menu" {
 
 Describe "Start-MainFunction" {
     BeforeEach {
+        $script:calls = 0
         Mock Show-Menu {}
-        Mock Write-Host {} 
+        #Mock Write-Host {} 
         Mock Get-ComputerInformation { return 'MockedValue' } 
         Mock Get-AllComputerInformation { return 'AllInfo' }
-        }
     }
-    Context "Valid selections" {
-        It "Handles option 1" {
-            $calls = 0
-                Mock Read-Host {
-                    $calls++
-                    if ($calls -eq 1) {
-                        return '1'
-                    }
-                    else{
-                        return '9'
-                    }
+        Context "Valid selections" {
+            It "Handles option 1" {
+                    Mock Read-Host {
+                        $script:calls++
+                        if ($script:calls -eq 1) {
+                            return '1'
+                        }
+                        else{
+                            return '9'
+                        }
                 } 
-            Start-MainFunction
-            Should -Invoke Get-ComputerInformation -Times 1
+                Start-MainFunction
+                Should -Invoke Get-ComputerInformation -Times 1
         
-    }
-
-        It "Handles option 8" {
-            $calls = 0
-                Mock Read-Host {
-                    $calls++
-                    if ($calls -eq 1) {
-                        return '8'
-                    }
-                    else{
-                        return '9'
-                    }
-                }
-            Start-MainFunction
-            Should -Invoke Get-AllComputerInformation -Times 1
-    }
-
-    Context "Invalid selection greater than 8" {
-        It "Prompts again on invalid high input" {
-            $calls = 0
-                Mock Read-Host {
-                    $calls++
-                    if ($calls -eq 1) {
-                        return '10'
-                    }
-                    else{
-                        return '9'
-                    }
             }
-            Start-MainFunction
-            Should -Invoke Show-Menu -Times 2
-        }
-    }
 
-    Context "Exit condition" {
-        It "Exits when user selects 9" {
-            Mock Read-Host { return '9' }
-            { Start-MainFunction } | Should -Not -Throw
+            It "Handles option 8" {
+                    Mock Read-Host {
+                        $script:calls++
+                        if ($script:calls -eq 1) {
+                            return '8'
+                        }
+                        else{
+                            return '9'
+                        }
+                    }
+                Start-MainFunction
+                Should -Invoke Get-AllComputerInformation -Times 1
+            }
         }
-    }
+        Context "Invalid selection greater than 8" {
+            It "Prompts again on invalid high input" {
+                    Mock Read-Host {
+                        $script:calls++
+                        if ($script:calls -eq 1) {
+                            return '10'
+                        }
+                        else{
+                            return '9'
+                        }
+                }
+                Start-MainFunction
+                Should -Invoke Show-Menu -Times 2
+            }
+        }
+
+        Context "Exit condition" {
+            It "Exits when user selects 9" {
+                Mock Read-Host { return '9' }
+                { Start-MainFunction } | Should -Not -Throw
+            }
+        }
 }
