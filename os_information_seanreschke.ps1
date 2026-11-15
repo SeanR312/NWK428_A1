@@ -79,7 +79,6 @@ function Start-MainFunction {
     do {
 
         $loopCounter++
-        Write-Host "Loop Count: $LoopCounter" -ForegroundColor Yellow
         if ($loopCounter -gt 20) {
             throw "Safety stop triggered"
         }

@@ -1,6 +1,7 @@
 
 # To Do: Change this
 . "$PSScriptRoot\os_information_seanreschke.ps1"
+#. .\os_information_seanreschke.ps1
 
 Describe "Get-ComputerInformation" {
     InModuleScope os_info_module {
@@ -77,6 +78,8 @@ Describe "Get-AllComputerInformation" {
 }
 
 Describe "Show-Menu" {
+    BeforeAll{ . "$PSScriptRoot\os_information_seanreschke.ps1"
+    }
     It "Displays menu options" {
         Mock Write-Host {}
 		# To Do: Change <ShowMenu> to the name of your function  
@@ -87,6 +90,8 @@ Describe "Show-Menu" {
 
 
 Describe "Start-MainFunction" {
+    BeforeAll{ . "$PSScriptRoot\os_information_seanreschke.ps1"
+    }
     BeforeEach {
         $script:calls = 0
         Mock Show-Menu {}
